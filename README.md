@@ -6,7 +6,9 @@ This course serves as an introduction to modern web application development with
 
 ## Course Content
 > The course provided by [fullstackopen](https://fullstackopen.com) is divided into multiple parts.
-### Part 0: Fundamentals of Web apps 
+
+
+###  Part 0: Fundamentals of Web apps
     a. General info
     b. Fundamentals of Web apps
 
