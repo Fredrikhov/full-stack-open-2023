@@ -1,0 +1,11 @@
+li {
+  list-style-type: none;
+  margin-left: 1%;
+  line-height: 3rem;
+}
+
+p {
+  margin: 10px;
+  margin-left: 1%;
+  font-weight: bold;
+}
