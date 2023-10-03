@@ -33,13 +33,13 @@ export const App = () => {
   return (
     <>
       <div>
-        <h1>Anecdote of the day</h1>
+        <h1 className={style.header}>Anecdote of the day</h1>
         <p className={style.p}>{anecdotes[selected]}</p>
         <p>Has {arrWithPoints[selected]} votes</p>
       </div>
-      <button onClick={handleClickVote}>Vote</button>
+      <button className={style.buttonSpace}onClick={handleClickVote}>Vote</button>
       <button onClick={handleClickGenerateRandomNum}>Get New Quote</button>
-      <h2>Anecdotes with the most votes</h2>
+      <h2 className={style.header}>Anecdotes with the most votes</h2>
       <p>{anecdotes[arrWithPoints.indexOf(highestPointQuote())]}</p>
       <p>has {highestPointQuote()} votes</p>
     </>
