@@ -5,7 +5,7 @@ import { SearchFilter } from "./components/SearchFilter";
 import { AddNewPerson } from "./components/AddNewPerson";
 import { ShowAllPeople } from "./components/ShowAllPeople";
 import { ShowFilteredPerson } from "./components/ShowFilteredPerson";
-import axios from "axios";
+import personService from "./services/persons";
 
 interface Person {
   id: number;
@@ -27,9 +27,7 @@ export const App = () => {
 
   const getDataFromJSONDB = () => {
     try {
-      axios
-        .get("http://localhost:3001/persons")
-        .then((response) => setPersons(response.data));
+      personService.getAll().then((response) => setPersons(response));
     } catch (err) {
       console.error(err);
       setPersons([]);
@@ -43,9 +41,13 @@ export const App = () => {
       phoneNumber: newPhone,
       id: persons.length + 1,
     };
+
+    /* check if person already exsist in arr and add */
     persons.some((person) => person.name === personObj.name)
       ? window.alert(`${personObj.name} is already added to phonebook`)
-      : setPersons((prev) => [...prev, personObj]);
+      : personService
+          .create(personObj)
+          .then((response) => setPersons((prev) => [...prev, response]));
   };
 
   const handleNameChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -61,6 +63,18 @@ export const App = () => {
   const handleSearchChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
     filterPersonArray;
     setNewSearch(e.target.value);
+  };
+
+  const handleDelete = (e: React.MouseEvent<HTMLElement>) => {
+    const id = Number(e.currentTarget.getAttribute("data-index"));
+    const personToDelete = persons.filter((p) => p.id === id);
+    window.confirm(`Delete ${personToDelete[0].name} ?`)
+      ? personService.remove(id)
+      : console.log("Delete person canceled");
+      
+
+    /*window.confirm(`Delete ${personToDelete.name}`);
+    personService.remove(id);*/
   };
 
   const filterPersonArray = persons.filter(({ name }) => {
@@ -81,7 +95,7 @@ export const App = () => {
         handlePhoneChanged={handlePhoneChanged}
         handleSubmit={handleSubmit}
       />
-      <ShowAllPeople persons={persons} />
+      <ShowAllPeople persons={persons} handleDelete={handleDelete} />
       <ShowFilteredPerson filterPersonArray={filterPersonArray} />
     </div>
   );
