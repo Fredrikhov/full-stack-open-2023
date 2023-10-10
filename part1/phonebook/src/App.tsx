@@ -76,6 +76,7 @@ export const App = () => {
     window.confirm(`Delete ${personToDelete[0].name} ?`)
       ? personService.remove(id)
       : console.log("Delete person canceled");
+    setPersons(persons.filter(item => item.id !== id));
   };
 
   const handlePut = (newName: string) => {

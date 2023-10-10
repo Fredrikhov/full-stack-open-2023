@@ -1,16 +1,6 @@
 {
   "persons": [
     {
-      "name": "Dan Abramov",
-      "phoneNumber": "1234567",
-      "id": 3
-    },
-    {
-      "name": "Mary Poppendieck",
-      "phoneNumber": "39-23-6423122",
-      "id": 4
-    },
-    {
       "name": "ss",
       "id": 5
     },
