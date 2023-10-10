@@ -47,11 +47,11 @@ export const App = () => {
       window.confirm(
         `${newName} is already added to phonebook, replace the old number with a new one?`
       )
-        ? handlePut(newName)
-        : // update phone num
-          console.log("Abort"); //abort update
+        ? handlePut(newName) // true - update
+        :                     
+          console.log("Abort"); // false abort
     } else {
-      // person does not exsist
+      // person does not exist
       personService
         .create({
           name: newName,
