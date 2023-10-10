@@ -6,6 +6,7 @@ import { AddNewPerson } from "./components/AddNewPerson";
 import { ShowAllPeople } from "./components/ShowAllPeople";
 import { ShowFilteredPerson } from "./components/ShowFilteredPerson";
 import personService from "./services/persons";
+import { Notification } from "./components/Notification";
 
 interface Person {
   id: number;
@@ -13,11 +14,17 @@ interface Person {
   phoneNumber: string | number;
 }
 
+interface Status {
+  type: boolean;
+  message: string;
+}
+
 export const App = () => {
   const [persons, setPersons] = useState<Person[]>([]);
   const [newName, setNewName] = useState("");
   const [newPhone, setNewPhone] = useState("");
   const [newSearch, setNewSearch] = useState("");
+  const [status, setStatus] = useState<Status>();
 
   useEffect(() => {
     if (newName !== "") setNewName("");
@@ -52,6 +59,7 @@ export const App = () => {
           id: persons[persons.length - 1].id + 1,
         })
         .then((response) => setPersons((prev) => [...prev, response]));
+      setStatus({ type: true, message: `Added ${newName}` });
     }
   };
 
@@ -74,9 +82,22 @@ export const App = () => {
     const id = Number(e.currentTarget.getAttribute("data-index"));
     const personToDelete = persons.filter((p) => p.id === id);
     window.confirm(`Delete ${personToDelete[0].name} ?`)
-      ? personService.remove(id)
+      ? deletePerson(id)
       : console.log("Delete person canceled");
-    setPersons(persons.filter(item => item.id !== id));
+    setPersons(personToDelete);
+  };
+
+  const deletePerson = (id: number) => {
+    personService
+      .remove(id)
+      .then(() => setPersons(persons.filter((person) => person.id !== id)))
+      .catch((error) => {
+        console.log(error);
+        setStatus({
+          type: false,
+          message: `Information of ${newName} has already been removed from server`,
+        });
+      });
   };
 
   const handlePut = (newName: string) => {
@@ -98,7 +119,7 @@ export const App = () => {
           )
         );
     } else {
-      console.log("Not found");
+      console.log("Not Found");
     }
   };
 
@@ -115,6 +136,7 @@ export const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification status={status} />
       <SearchFilter
         searchText={newSearch}
         handleSearchChanged={handleSearchChanged}

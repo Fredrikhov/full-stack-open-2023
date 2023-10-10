@@ -17,7 +17,7 @@ export const AddNewPerson = ({
 }: IAddNewPerson) => {
   return (
     <>
-      <h3>Add a new</h3>
+      <h2>Add a new</h2>
       <form>
         name: <input value={newName} onChange={handleNameChanged} />
         number: <input value={newPhone} onChange={handlePhoneChanged} />

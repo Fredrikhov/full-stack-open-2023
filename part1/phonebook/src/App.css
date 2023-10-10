@@ -1,0 +1,25 @@
+*{
+    list-style-type: none;
+    margin:0;
+    padding:0;
+}
+
+#root{
+    padding:10px;
+}
+
+h1,h2,h3,h4{
+    margin:1rem;
+}
+
+ul li{
+    margin-left:1rem;
+}
+
+form{
+    margin-left:1rem;
+}
+
+#root div{
+    margin-left:1rem;
+}
