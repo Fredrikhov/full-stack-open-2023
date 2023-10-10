@@ -36,18 +36,23 @@ export const App = () => {
 
   const handleSubmit = (e: MouseEvent<HTMLElement>) => {
     e.preventDefault();
-    const personObj = {
-      name: newName,
-      phoneNumber: newPhone,
-      id: persons.length + 1,
-    };
-
-    /* check if person already exsist in arr and add */
-    persons.some((person) => person.name === personObj.name)
-      ? window.alert(`${personObj.name} is already added to phonebook`)
-      : personService
-          .create(personObj)
-          .then((response) => setPersons((prev) => [...prev, response]));
+    if (personDoesExist(newName)) {
+      window.confirm(
+        `${newName} is already added to phonebook, replace the old number with a new one?`
+      )
+        ? handlePut(newName)
+        : // update phone num
+          console.log("Abort"); //abort update
+    } else {
+      // person does not exsist
+      personService
+        .create({
+          name: newName,
+          phoneNumber: newPhone,
+          id: persons[persons.length - 1].id + 1,
+        })
+        .then((response) => setPersons((prev) => [...prev, response]));
+    }
   };
 
   const handleNameChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -71,15 +76,40 @@ export const App = () => {
     window.confirm(`Delete ${personToDelete[0].name} ?`)
       ? personService.remove(id)
       : console.log("Delete person canceled");
-      
+  };
 
-    /*window.confirm(`Delete ${personToDelete.name}`);
-    personService.remove(id);*/
+  const handlePut = (newName: string) => {
+    const found = findPerson(newName);
+    if (found != undefined) {
+      personService
+        .update(found.id, {
+          name: found.name,
+          phoneNumber: newPhone,
+          id: found.id,
+        })
+        .then((response) =>
+          setPersons((persons) =>
+            persons.map((person) =>
+              person.id === response.id
+                ? { ...person, phoneNumber: response.phoneNumber }
+                : person
+            )
+          )
+        );
+    } else {
+      console.log("Not found");
+    }
   };
 
   const filterPersonArray = persons.filter(({ name }) => {
     if (name.toLowerCase().includes(newSearch)) return name;
   });
+
+  const personDoesExist = (newName: string) =>
+    persons.some((person) => person.name === newName);
+
+  const findPerson = (newName: string) =>
+    persons.find((person) => person.name === newName);
 
   return (
     <div>

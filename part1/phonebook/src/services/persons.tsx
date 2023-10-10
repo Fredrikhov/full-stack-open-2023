@@ -14,7 +14,10 @@ const create = (personObj: Person) =>
 
 const remove = (id: number) => axios.delete(`${baseUrl}/${id}`);
 
-export default { getAll, create, remove };
+const update = (id: number, newPerson: Person) =>
+  axios.put(`${baseUrl}/${id}`, newPerson).then((response) => response.data);
+
+export default { getAll, create, remove, update };
 
 /*2.12: The Phonebook step7
 Let's return to our phonebook application.*/
