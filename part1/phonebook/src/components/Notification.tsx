@@ -1,4 +1,5 @@
 import style from "./Notification.module.css";
+
 interface iNotification {
   status?: {
     type?: boolean;
