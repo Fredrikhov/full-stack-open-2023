@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import "./App.css";
 import { Form } from "./components/Form";
 import { getAll } from "./services/fetchData";
-import { SearchResult } from "./components/searchResult";
+import { SearchResult } from "./components/SearchResult";
 
-interface LandInfo {
+export interface LandInfo {
   name: {
     common: string;
     official: string;
@@ -15,23 +15,26 @@ interface LandInfo {
       };
     };
   };
+  capital: string[];
+  languages: {
+    language: string;
+  }[];
+  flags: {
+    png: string;
+  };
 }
 
 export const App = () => {
-  const [search, setSearch] = useState(null || "");
+  //const [search, setSearch] = useState(null || "");
   const [lands, setLands] = useState<Partial<LandInfo>[]>([]);
-  // !!! TODO: Fix issue with any
-  //const [arr, setArr] = useState<any[]>([]); 
-  const [arr, setArr] = useState<any[]>([]);
+  const [filteredLand, setFilteredLand] = useState<Partial<LandInfo>[]>([]);
 
-  // render after first init render
+  // render after first OnMount
   useEffect(() => {
-    if (lands.length === 0) {
-      getCountriesFromSearch();
-    }
+    getAllCountries();
   }, []);
 
-  const getCountriesFromSearch = () => {
+  const getAllCountries = () => {
     try {
       getAll(`https://studies.cs.helsinki.fi/restcountries/api/all`).then(
         (response) => setLands(response)
@@ -40,33 +43,47 @@ export const App = () => {
       console.log(`ERROR: ${er} `);
     } finally {
       console.log("Finally clause");
-      
     }
   };
 
   const filterSearch = (param: string) => {
-    // !!! 
-    const res = lands
-      .map((land) => land.name?.common.toLowerCase())
-      .filter((land) => land?.match(param));
-    if(res !== undefined){ 
-      setArr(res);  
-    } else {
-      setArr([]);
+    if (lands) {
+      const res = lands.filter((land) =>
+        land.name?.common.toLowerCase().match(param)
+      );
+      setFilteredLand(res);
     }
-    console.log(res);
   };
 
+  /**
+   * 1.
+   * @param e void
+   */
   const handleSearchChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearch(e.target.value);
     filterSearch(e.target.value.toLowerCase());
+    //console.log(e.target.value);
   };
+
+  /**
+   * debounce på handlesearch (throttle)
+   *  hvis ikke - hent alle land - ondemand api call
+   *
+   *
+   * 1. debounce uten api-call
+   *    her antar man etter ? sekunder at søket er stavet korrekt
+   *  2. debouce m/ api call
+   *    etter x sekunder hent data - filterer ut ifra søketekst
+   *  3. debounce m/ riktig søk.
+   *
+   * 4. flytt alle logikk og data inn i en context -
+   *
+   */
 
   return (
     <>
       <h1>Hellu world</h1>
-      <Form searchText={search} handleSearchChanged={handleSearchChanged} />
-      <SearchResult arr={arr} />
+      <Form handleSearchChanged={handleSearchChanged} />
+      <SearchResult filteredLand={filteredLand} />
     </>
   );
 };
