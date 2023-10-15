@@ -18,14 +18,13 @@ export interface LandInfo {
   capital: string[];
   languages: {
     language: string;
-  }[];
+  };
   flags: {
     png: string;
   };
 }
 
 export const App = () => {
-  //const [search, setSearch] = useState(null || "");
   const [lands, setLands] = useState<Partial<LandInfo>[]>([]);
   const [filteredLand, setFilteredLand] = useState<Partial<LandInfo>[]>([]);
 
@@ -55,16 +54,11 @@ export const App = () => {
     }
   };
 
-  /**
-   * 1.
-   * @param e void
-   */
   const handleSearchChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
     filterSearch(e.target.value.toLowerCase());
-    //console.log(e.target.value);
   };
 
-  /**
+  /** TODO:
    * debounce på handlesearch (throttle)
    *  hvis ikke - hent alle land - ondemand api call
    *
@@ -84,6 +78,7 @@ export const App = () => {
       <h1>Hellu world</h1>
       <Form handleSearchChanged={handleSearchChanged} />
       <SearchResult filteredLand={filteredLand} />
+      {/* <Weather land="London" /> */}
     </>
   );
 };
