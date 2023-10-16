@@ -16,9 +16,7 @@ export interface LandInfo {
     };
   };
   capital: string[];
-  languages: {
-    language: string;
-  };
+  languages: { [key: string]: string };
   flags: {
     png: string;
   };
@@ -78,7 +76,6 @@ export const App = () => {
       <h1>Hellu world</h1>
       <Form handleSearchChanged={handleSearchChanged} />
       <SearchResult filteredLand={filteredLand} />
-      {/* <Weather land="London" /> */}
     </>
   );
 };

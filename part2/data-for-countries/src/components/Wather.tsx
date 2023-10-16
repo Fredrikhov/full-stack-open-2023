@@ -14,14 +14,12 @@ type TWeather = {
     pressure: number;
     humidity: number;
   };
-  weather: [
-    {
-      id: number;
-      main: string;
-      description: string;
-      icon: string;
-    }
-  ];
+  weather: {
+    id: number;
+    main: string;
+    description: string;
+    icon: string;
+  }[];
 };
 
 interface ILand {
@@ -50,7 +48,13 @@ export const Weather = ({ land }: ILand) => {
     }
   };
   console.log(API_KEY);
-
+  /**
+   * om den laster - spinner
+   * retur null
+   * if error - return error
+   *
+   * alt ok - hvis alt
+   */
   return (
     <>
       <div>Weather in {land}</div>

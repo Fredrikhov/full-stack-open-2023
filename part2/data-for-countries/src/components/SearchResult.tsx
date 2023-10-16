@@ -7,7 +7,7 @@ interface ISearchResult {
 }
 
 export const SearchResult = ({ filteredLand }: ISearchResult) => {
-  const [clicked, setClicked] = useState(false);
+  const [clicked, setClicked] = useState(false); // legge denne i app.tsx?
   const [valueOfElem, setValueOfElem] = useState(0);
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -48,14 +48,18 @@ export const SearchResult = ({ filteredLand }: ISearchResult) => {
         (clicked && showLand())
     );
   } else if (filteredLand.length === 1) {
+    const resolved = filteredLand[0];
     return (
       <>
-        <h1>{filteredLand[0].name?.common}</h1>
-        <p>Capitol: {filteredLand[0].capital}</p>
-        {/* TODO: Legge inn språk */}
-        <p>Language: {filteredLand[0].languages?.language}</p>
-        <img src={filteredLand[0].flags?.png}></img>
-        <Weather land={filteredLand[0].name?.common} />
+        <h1>{resolved.name?.common}</h1>
+        <p>Capitol: {resolved.capital}</p>
+        <p>
+          Language:{" "}
+          {resolved.languages &&
+            Object.values(resolved.languages).map((language) => language + " ")}
+        </p>
+        <img src={resolved.flags?.png}></img>
+        <Weather land={resolved.name?.common} />
       </>
     );
   } else {
