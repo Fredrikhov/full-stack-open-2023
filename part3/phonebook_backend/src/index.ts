@@ -1,12 +1,27 @@
 import express, { Express, Request, Response } from "express";
 import dotenv from "dotenv";
+import morgan from "morgan";
 
 dotenv.config();
 
 const app: Express = express();
 const port = process.env.PORT;
+app.use(express.json());
+/** 3.7: Phonebook backend step7 */
+app.use(morgan("tiny"));
 
-const persons = [
+/** 3.8*: Phonebook backend step8 */
+app.use(
+  morgan(":method :url :status :response-time ms :res[content-length] :POST")
+);
+morgan.token("POST", (req: Request, res: Response) => JSON.stringify(req.body));
+interface IPersons {
+  id: number;
+  name: string;
+  number: string;
+}
+[];
+let persons: IPersons[] = [
   {
     id: 1,
     name: "Arto Hellas",
@@ -32,7 +47,7 @@ const persons = [
 app.get("/", (req: Request, res: Response) => {
   res.send("Express + TypeScript Server");
 });
-/** Get JSON of all persons in arr */
+/** 3.1: Phonebook backend step1 */
 app.get("/api/persons", (req: Request, res: Response) => {
   try {
     return res.json(persons);
@@ -40,6 +55,63 @@ app.get("/api/persons", (req: Request, res: Response) => {
     res.send("error").status(404).end();
   }
 });
+/** 3.2: Phonebook backend step2 */
+app.get("/info", (req: Request, res: Response) => {
+  res.send(`<p>Phonebook har info for 2 people</p> ${new Date()}`);
+});
+/** 3.3: Phonebook backend step3 */
+app.get("/api/persons/:id", (req: Request, res: Response) => {
+  const personId = persons.find(
+    (person) => person.id === Number(req.params.id)
+  );
+  if (personId) {
+    res.send(personId);
+  } else {
+    res.status(404);
+    res.send("Person does not exsist").end();
+  }
+});
+/** 3.4: Phonebook backend step4 */
+app.delete("/api/persons/:id", (req: Request, res: Response) => {
+  persons = persons.filter((person) => person.id !== Number(req.params.id));
+  if (persons) {
+    res.status(204).end();
+  } else {
+    res.status(404).end();
+  }
+});
+/** 3.6: Phonebook backend step6 */
+app.post("/api/persons", (req: Request, res: Response) => {
+  req.body
+    ? postPerson(req, res)
+    : res.status(400).json({ error: "Content missing" });
+});
+const postPerson = (req: Request, res: Response) => {
+  try {
+    if (
+      req.body.name &&
+      req.body.number &&
+      !persons.some((person) => person.name === req.body.name)
+    ) {
+      const person: IPersons = {
+        id: Math.floor(Math.random() * 1000),
+        name: req.body.name,
+        number: req.body.number,
+      };
+      persons = [...persons, person];
+      res.json(`Person ${person.name} added`);
+    } else {
+      res
+        .status(400)
+        .send(
+          "Could not add person due to missing fields, content or already added"
+        )
+        .end();
+    }
+  } catch (e) {
+    res.status(400).send("Could not post person").end();
+  }
+};
 app.listen(port, () => {
   console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
 });
