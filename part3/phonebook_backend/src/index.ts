@@ -1,12 +1,20 @@
 import express, { Express, Request, Response } from "express";
 import dotenv from "dotenv";
 import morgan from "morgan";
+import cors from "cors";
+
+interface IPersons {
+  id: number;
+  name: string;
+  number: string;
+}
+[];
 
 dotenv.config();
-
 const app: Express = express();
 const port = process.env.PORT;
 app.use(express.json());
+app.use(cors());
 /** 3.7: Phonebook backend step7 */
 app.use(morgan("tiny"));
 
@@ -14,13 +22,9 @@ app.use(morgan("tiny"));
 app.use(
   morgan(":method :url :status :response-time ms :res[content-length] :POST")
 );
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 morgan.token("POST", (req: Request, res: Response) => JSON.stringify(req.body));
-interface IPersons {
-  id: number;
-  name: string;
-  number: string;
-}
-[];
+
 let persons: IPersons[] = [
   {
     id: 1,
@@ -45,7 +49,26 @@ let persons: IPersons[] = [
 ];
 /** Root of the application */
 app.get("/", (req: Request, res: Response) => {
-  res.send("Express + TypeScript Server");
+  res.send(
+    `<h1>Persons API server</h1> 
+    <p>Get information about persons via a RESTful API</p>
+    <table>
+      <tbody>
+        <tr>
+          <th>Endpoint</th>
+          <th>Description</th>
+        </tr>
+        <tr>
+          <td>/api/persons</td>
+          <td>All persons</td>
+        </tr>
+        <tr>
+        <td>/api/persons/{id}</td>
+        <td>Get person by id</td>
+      </tr>
+      </tbody>
+    </table>`
+  );
 });
 /** 3.1: Phonebook backend step1 */
 app.get("/api/persons", (req: Request, res: Response) => {
