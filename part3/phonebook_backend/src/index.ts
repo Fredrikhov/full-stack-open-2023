@@ -15,6 +15,7 @@ const app: Express = express();
 const port = process.env.PORT;
 app.use(express.json());
 app.use(cors());
+app.use(express.static("dist_frontend"));
 /** 3.7: Phonebook backend step7 */
 app.use(morgan("tiny"));
 

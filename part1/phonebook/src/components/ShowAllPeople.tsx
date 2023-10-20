@@ -1,11 +1,8 @@
 import React from "react";
+import { Person } from "../App.tsx";
 
 interface IShowAllPeople {
-  persons: {
-    id: number;
-    name: string;
-    phoneNumber: number | string;
-  }[];
+  persons: Person[];
   handleDelete: (e: React.MouseEvent<HTMLElement>) => void;
 }
 
@@ -17,7 +14,10 @@ export const ShowAllPeople = ({ persons, handleDelete }: IShowAllPeople) => {
         {persons.map((person) => {
           return (
             <li key={person.id}>
-              {`${person.name} ${person.phoneNumber}`} <button data-index={person.id} onClick={handleDelete}>Delete</button>
+              {`${person.name} ${person.number}`}{" "}
+              <button data-index={person.id} onClick={handleDelete}>
+                Delete
+              </button>
             </li>
           );
         })}

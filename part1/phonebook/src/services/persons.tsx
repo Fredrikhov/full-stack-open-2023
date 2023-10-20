@@ -1,11 +1,7 @@
 import axios from "axios";
-const baseUrl = "http://localhost:3001/persons";
+const baseUrl = "/api/persons";
+import { Person } from "../App.tsx";
 
-interface Person {
-  id: number;
-  name: string;
-  phoneNumber: string | number;
-}
 // only return reponse.data property
 const getAll = () => axios.get(baseUrl).then((response) => response.data);
 

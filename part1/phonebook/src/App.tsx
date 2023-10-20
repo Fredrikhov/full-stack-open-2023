@@ -8,11 +8,12 @@ import { ShowFilteredPerson } from "./components/ShowFilteredPerson";
 import personService from "./services/persons";
 import { Notification } from "./components/Notification";
 
-interface Person {
+export interface Person {
   id: number;
   name: string;
-  phoneNumber: string | number;
+  number: string | number;
 }
+[];
 
 interface Status {
   type: boolean;
@@ -48,14 +49,13 @@ export const App = () => {
         `${newName} is already added to phonebook, replace the old number with a new one?`
       )
         ? handlePut(newName) // true - update
-        :                     
-          console.log("Abort"); // false abort
+        : console.log("Abort"); // false abort
     } else {
       // person does not exist
       personService
         .create({
           name: newName,
-          phoneNumber: newPhone,
+          number: newPhone,
           id: persons[persons.length - 1].id + 1,
         })
         .then((response) => setPersons((prev) => [...prev, response]));
@@ -106,14 +106,14 @@ export const App = () => {
       personService
         .update(found.id, {
           name: found.name,
-          phoneNumber: newPhone,
+          number: newPhone,
           id: found.id,
         })
         .then((response) =>
           setPersons((persons) =>
             persons.map((person) =>
               person.id === response.id
-                ? { ...person, phoneNumber: response.phoneNumber }
+                ? { ...person, number: response.number }
                 : person
             )
           )
