@@ -17,7 +17,6 @@ export const Notification = ({ status }: iNotification) => {
         ) : (
           <div className={style.error}>{status?.message}</div>
         )}
-        ;
       </>
     );
   }

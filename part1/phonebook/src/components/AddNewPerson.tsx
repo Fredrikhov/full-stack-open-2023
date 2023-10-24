@@ -21,7 +21,9 @@ export const AddNewPerson = ({
       <form>
         name: <input value={newName} onChange={handleNameChanged} />
         number: <input value={newPhone} onChange={handlePhoneChanged} />
-        <button type="submit" onClick={handleSubmit}>Add</button>
+        <button type="submit" onClick={handleSubmit}>
+          Add
+        </button>
       </form>
     </>
   );

@@ -11,7 +11,7 @@ export const ShowFilteredPerson = ({
       <h2>Filter's elements</h2>
       <ul>
         {filterPersonArray.map((person) => {
-          return <li key={person.id}>{`${person.name} ${person.number}`}</li>;
+          return <li key={person.name}>{`${person.name} ${person.number}`}</li>;
         })}
       </ul>
     </>

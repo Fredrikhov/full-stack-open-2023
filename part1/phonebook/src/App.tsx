@@ -9,11 +9,10 @@ import personService from "./services/persons";
 import { Notification } from "./components/Notification";
 
 export interface Person {
-  id: number;
+  id?: string;
   name: string;
   number: string | number;
 }
-[];
 
 interface Status {
   type: boolean;
@@ -36,11 +35,17 @@ export const App = () => {
   const getDataFromJSONDB = () => {
     try {
       personService.getAll().then((response) => setPersons(response));
+      console.log(persons);
     } catch (err) {
       console.error(err);
       setPersons([]);
     }
   };
+  const personDoesExist = (newName: string) =>
+    persons.some((person) => person.name === newName);
+
+  const findPerson = (newName: string) =>
+    persons.find((person) => person.name === newName);
 
   const handleSubmit = (e: MouseEvent<HTMLElement>) => {
     e.preventDefault();
@@ -56,7 +61,6 @@ export const App = () => {
         .create({
           name: newName,
           number: newPhone,
-          id: persons[persons.length - 1].id + 1,
         })
         .then((response) => setPersons((prev) => [...prev, response]));
       setStatus({ type: true, message: `Added ${newName}` });
@@ -70,6 +74,7 @@ export const App = () => {
 
   const handlePhoneChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
+    console.log(e.target.value);
     setNewPhone(e.target.value);
   };
 
@@ -79,35 +84,45 @@ export const App = () => {
   };
 
   const handleDelete = (e: React.MouseEvent<HTMLElement>) => {
-    const id = Number(e.currentTarget.getAttribute("data-index"));
-    const personToDelete = persons.filter((p) => p.id === id);
-    window.confirm(`Delete ${personToDelete[0].name} ?`)
-      ? deletePerson(id)
-      : console.log("Delete person canceled");
-    setPersons(personToDelete);
+    const id = e.currentTarget.getAttribute("data-index");
+    const personToDelete = persons.filter((person) => person.id === id);
+    if (personToDelete[0].id) {
+      window.confirm(`Delete ${personToDelete[0].name} ?`)
+        ? deletePerson(id)
+        : console.log("Canceled");
+    } else {
+      console.log(`person id is undefined`);
+    }
   };
 
-  const deletePerson = (id: number) => {
-    personService
-      .remove(id)
-      .then(() => setPersons(persons.filter((person) => person.id !== id)))
-      .catch((error) => {
-        console.log(error);
-        setStatus({
-          type: false,
-          message: `Information of ${newName} has already been removed from server`,
+  const deletePerson = (id: string | null) => {
+    if (id === null) {
+      throw new Error(`id null`);
+    } else {
+      personService
+        .remove(id)
+        .then(() => setPersons(persons.filter((person) => person.id !== id)))
+        .catch((error) => {
+          console.log(error);
+          setStatus({
+            type: false,
+            message: `Information of ${newName} has already been removed from server`,
+          });
         });
-      });
+    }
   };
 
   const handlePut = (newName: string) => {
     const found = findPerson(newName);
-    if (found != undefined) {
+    //console.log(JSON.stringify(found));
+
+    if (found?.id !== undefined) {
+      console.log("running");
+
       personService
         .update(found.id, {
           name: found.name,
           number: newPhone,
-          id: found.id,
         })
         .then((response) =>
           setPersons((persons) =>
@@ -117,7 +132,11 @@ export const App = () => {
                 : person
             )
           )
-        );
+        )
+        .catch((e: Error) => console.log(e.message))
+        .finally(() => {
+          console.log(JSON.stringify(persons));
+        });
     } else {
       console.log("Not Found");
     }
@@ -126,12 +145,6 @@ export const App = () => {
   const filterPersonArray = persons.filter(({ name }) => {
     if (name.toLowerCase().includes(newSearch)) return name;
   });
-
-  const personDoesExist = (newName: string) =>
-    persons.some((person) => person.name === newName);
-
-  const findPerson = (newName: string) =>
-    persons.find((person) => person.name === newName);
 
   return (
     <div>

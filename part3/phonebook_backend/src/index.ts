@@ -1,14 +1,20 @@
-import express, { Express, Request, Response } from "express";
+import express, {
+  Express,
+  ErrorRequestHandler,
+  NextFunction,
+  Request,
+  Response,
+} from "express";
 import dotenv from "dotenv";
 import morgan from "morgan";
 import cors from "cors";
+import Person from "../models/person";
 
-interface IPersons {
-  id: number;
-  name: string;
-  number: string;
+export interface IPerson {
+  id?: string;
+  name?: string;
+  number?: string | number;
 }
-[];
 
 dotenv.config();
 const app: Express = express();
@@ -19,6 +25,19 @@ app.use(express.static("dist_frontend"));
 /** 3.7: Phonebook backend step7 */
 app.use(morgan("tiny"));
 
+const errorHandler: ErrorRequestHandler = (
+  e: Error,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  console.log(e, typeof next);
+  switch (e.name) {
+    case "CastError":
+      res.status(400).send({ error: "malformatted id" });
+  }
+};
+
 /** 3.8*: Phonebook backend step8 */
 app.use(
   morgan(":method :url :status :response-time ms :res[content-length] :POST")
@@ -26,28 +45,6 @@ app.use(
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 morgan.token("POST", (req: Request, res: Response) => JSON.stringify(req.body));
 
-let persons: IPersons[] = [
-  {
-    id: 1,
-    name: "Arto Hellas",
-    number: "040-123456",
-  },
-  {
-    id: 2,
-    name: "Ada Lovelace",
-    number: "39-44-5323523",
-  },
-  {
-    id: 3,
-    name: "Dan Abramov",
-    number: "12-43-234345",
-  },
-  {
-    id: 4,
-    name: "Mary Poppendieck",
-    number: "39-23-6423122",
-  },
-];
 /** Root of the application */
 app.get("/", (req: Request, res: Response) => {
   res.send(
@@ -72,64 +69,77 @@ app.get("/", (req: Request, res: Response) => {
   );
 });
 /** 3.1: Phonebook backend step1 */
-app.get("/api/persons", (req: Request, res: Response) => {
-  try {
-    return res.json(persons);
-  } catch (e) {
-    res.send("error").status(404).end();
-  }
+app.get("/api/persons", (req: Request, res: Response, next: NextFunction) => {
+  Person.find({})
+    .then((persons) => (persons ? res.json(persons) : res.status(404).end()))
+    .catch((e: Error) => next(e));
 });
 /** 3.2: Phonebook backend step2 */
 app.get("/info", (req: Request, res: Response) => {
   res.send(`<p>Phonebook har info for 2 people</p> ${new Date()}`);
 });
-/** 3.3: Phonebook backend step3 */
-app.get("/api/persons/:id", (req: Request, res: Response) => {
-  const personId = persons.find(
-    (person) => person.id === Number(req.params.id)
-  );
-  if (personId) {
-    res.send(personId);
-  } else {
-    res.status(404);
-    res.send("Person does not exsist").end();
+app.get(
+  "/api/persons/:id",
+  (req: Request, res: Response, next: NextFunction) => {
+    Person.findById(req.params.id)
+      .then((person) => (person ? res.json(person) : res.status(404).end()))
+      .catch((e: Error) => {
+        next(e);
+      });
   }
-});
-/** 3.4: Phonebook backend step4 */
-app.delete("/api/persons/:id", (req: Request, res: Response) => {
-  persons = persons.filter((person) => person.id !== Number(req.params.id));
-  if (persons) {
-    res.status(204).end();
-  } else {
-    res.status(404).end();
+);
+
+app.delete(
+  "/api/persons/:id",
+  (req: Request, res: Response, next: NextFunction) => {
+    Person.findByIdAndDelete(req.params.id)
+      .then(() => res.status(204).end())
+      .catch((e) => next(e));
   }
-});
+);
+
+app.put(
+  "/api/persons/:id",
+  (req: Request, res: Response, next: NextFunction) => {
+    req.body
+      ? putPerson(req, res, next)
+      : res.status(400).json({ error: "Person not found" });
+  }
+);
+
+const putPerson = (req: Request, res: Response, next: NextFunction) => {
+  const person: IPerson = {
+    name: req.body.name,
+    number: req.body.number,
+  };
+  Person.findByIdAndUpdate(req.params.id, person, { new: true })
+    .then((updatedPerson) => res.json(updatedPerson))
+    .catch((e: Error) => next(e))
+    .finally(() => {
+      console.log(person);
+    });
+};
+
 /** 3.6: Phonebook backend step6 */
 app.post("/api/persons", (req: Request, res: Response) => {
   req.body
     ? postPerson(req, res)
     : res.status(400).json({ error: "Content missing" });
 });
+
 const postPerson = (req: Request, res: Response) => {
   try {
-    if (
-      req.body.name &&
-      req.body.number &&
-      !persons.some((person) => person.name === req.body.name)
-    ) {
-      const person: IPersons = {
-        id: Math.floor(Math.random() * 1000),
+    if (req.body.name && req.body.number) {
+      const person = new Person({
         name: req.body.name,
         number: req.body.number,
-      };
-      persons = [...persons, person];
-      res.json(`Person ${person.name} added`);
+      });
+
+      person.save().then((savedPerson) => res.json(savedPerson));
     } else {
       res
         .status(400)
-        .send(
-          "Could not add person due to missing fields, content or already added"
-        )
+        .send("Could not add person due to missing fields or content")
         .end();
     }
   } catch (e) {
@@ -139,3 +149,5 @@ const postPerson = (req: Request, res: Response) => {
 app.listen(port, () => {
   console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
 });
+
+app.use(errorHandler);

@@ -8,9 +8,9 @@ const getAll = () => axios.get(baseUrl).then((response) => response.data);
 const create = (personObj: Person) =>
   axios.post(baseUrl, personObj).then((response) => response.data);
 
-const remove = (id: number) => axios.delete(`${baseUrl}/${id}`);
+const remove = (id: string) => axios.delete(`${baseUrl}/${id}`);
 
-const update = (id: number, newPerson: Person) =>
+const update = (id: string, newPerson: Person) =>
   axios.put(`${baseUrl}/${id}`, newPerson).then((response) => response.data);
 
 export default { getAll, create, remove, update };
