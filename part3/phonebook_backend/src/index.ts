@@ -37,7 +37,7 @@ const errorHandler: ErrorRequestHandler = (
       res.status(400).send({ error: "malformatted id" });
       break;
     case "ValidationError":
-      res.status(400).json({ Error: e.message });
+      res.status(400).send({ Error: e.message });
       break;
   }
 };
@@ -147,10 +147,7 @@ const postPerson = (req: Request, res: Response, next: NextFunction) => {
         .then((savedPerson) => res.json(savedPerson))
         .catch((e: Error) => next(e));
     } else {
-      res
-        .status(400)
-        .send("Could not add person due to missing fields or content")
-        .end();
+      res.status(400).send("Error person else").end();
     }
   } catch (e) {
     res.status(400).send("Could not post person").end();

@@ -66,9 +66,13 @@ export const App = () => {
           setPersons((prev) => [...prev, response]);
           setStatus({ type: true, message: `Added ${newName}` });
         })
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .catch((e: Error | any) => {
-          console.log(e.message);
-          setStatus({ type: false, message: e.response.data.error });
+          //console.log(JSON.stringify(e.response.data));
+          setStatus({
+            type: false,
+            message: `Error: ${Object.values(e.response.data)}`,
+          });
         });
     }
   };
