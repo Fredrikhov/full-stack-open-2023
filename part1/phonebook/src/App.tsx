@@ -62,8 +62,14 @@ export const App = () => {
           name: newName,
           number: newPhone,
         })
-        .then((response) => setPersons((prev) => [...prev, response]));
-      setStatus({ type: true, message: `Added ${newName}` });
+        .then((response) => {
+          setPersons((prev) => [...prev, response]);
+          setStatus({ type: true, message: `Added ${newName}` });
+        })
+        .catch((e: Error | any) => {
+          console.log(e.message);
+          setStatus({ type: false, message: e.response.data.error });
+        });
     }
   };
 

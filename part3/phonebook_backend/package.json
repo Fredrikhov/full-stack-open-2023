@@ -9,7 +9,8 @@
     "build:ui": "DISABLE_ESLINT_PLUGIN=true cd ../../part1/phonebook && pnpm run build && cp -r dist_frontend ../../part3/phonebook_backend",
     "start": "tsc && node dist/index.js",
     "dev": "nodemon - exec 'ts-node' index.ts",
-    "mongo" : "tsc && 'ts-node' mongo.ts"
+    "mongo" : "tsc && 'ts-node' mongo.ts",
+    "lint": "eslint ."
   },
   "keywords": [],
   "author": "",

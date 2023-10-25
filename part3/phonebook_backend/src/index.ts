@@ -35,6 +35,10 @@ const errorHandler: ErrorRequestHandler = (
   switch (e.name) {
     case "CastError":
       res.status(400).send({ error: "malformatted id" });
+      break;
+    case "ValidationError":
+      res.status(400).json({ Error: e.message });
+      break;
   }
 };
 
@@ -112,7 +116,10 @@ const putPerson = (req: Request, res: Response, next: NextFunction) => {
     name: req.body.name,
     number: req.body.number,
   };
-  Person.findByIdAndUpdate(req.params.id, person, { new: true })
+  Person.findByIdAndUpdate(req.params.id, person, {
+    new: true,
+    runValidators: true,
+  })
     .then((updatedPerson) => res.json(updatedPerson))
     .catch((e: Error) => next(e))
     .finally(() => {
@@ -121,13 +128,13 @@ const putPerson = (req: Request, res: Response, next: NextFunction) => {
 };
 
 /** 3.6: Phonebook backend step6 */
-app.post("/api/persons", (req: Request, res: Response) => {
+app.post("/api/persons", (req: Request, res: Response, next: NextFunction) => {
   req.body
-    ? postPerson(req, res)
+    ? postPerson(req, res, next)
     : res.status(400).json({ error: "Content missing" });
 });
 
-const postPerson = (req: Request, res: Response) => {
+const postPerson = (req: Request, res: Response, next: NextFunction) => {
   try {
     if (req.body.name && req.body.number) {
       const person = new Person({
@@ -135,7 +142,10 @@ const postPerson = (req: Request, res: Response) => {
         number: req.body.number,
       });
 
-      person.save().then((savedPerson) => res.json(savedPerson));
+      person
+        .save()
+        .then((savedPerson) => res.json(savedPerson))
+        .catch((e: Error) => next(e));
     } else {
       res
         .status(400)
