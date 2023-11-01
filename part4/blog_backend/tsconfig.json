@@ -1,9 +1,11 @@
 {
     "extends": "@tsconfig/node-lts/tsconfig.json",
-    "include": ["src"],
+    "include": ["src", "tests"],
     "exclude": ["node_modules"],
+    "target": "ES6",
     "compilerOptions": {
-          "outDir": "dist"
-        },
+          "outDir": "dist",
+          "types" : ["jest"]
+        }
   }
   
